@@ -1,0 +1,13 @@
+import requests
+
+def send_sms(phone, text):
+    api_id = 'ВАШ_SMSRU_API_ID'  # ← ВСТАВЬ СВОЙ КЛЮЧ
+    url = 'https://sms.ru/sms/send'
+    payload = {
+        'api_id': api_id,
+        'to': phone,
+        'msg': text,
+        'json': 1
+    }
+    response = requests.post(url, data=payload)
+    return response.json()
