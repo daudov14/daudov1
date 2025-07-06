@@ -1,0 +1,15 @@
+from app import db
+
+class Client(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(100))
+    phone = db.Column(db.String(20))
+
+class Installment(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    client_id = db.Column(db.Integer, db.ForeignKey('client.id'), nullable=False)
+    amount = db.Column(db.Float, nullable=False)
+    months = db.Column(db.Integer, nullable=False)
+    start_date = db.Column(db.String(20), nullable=False)
+
+    client = db.relationship('Client', backref=db.backref('installments', lazy=True))
