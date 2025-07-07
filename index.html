@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <title>Простой Мессенджер</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 500px;
+      margin: 30px auto;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+    }
+    #messages {
+      height: 300px;
+      overflow-y: auto;
+      border: 1px solid #ddd;
+      padding: 10px;
+      margin-bottom: 10px;
+      background: #f9f9f9;
+    }
+    .message {
+      margin-bottom: 8px;
+    }
+    .me {
+      color: blue;
+    }
+    .server {
+      color: green;
+    }
+  </style>
+</head>
+<body>
+
+  <h2>Простой Мессенджер</h2>
+  <div id="messages"></div>
+  <input type="text" id="inputMsg" placeholder="Введите сообщение" style="width: 80%;" />
+  <button id="sendBtn">Отправить</button>
+
+  <script>
+    const messages = document.getElementById('messages');
+    const inputMsg = document.getElementById('inputMsg');
+    const sendBtn = document.getElementById('sendBtn');
+
+    const ws = new WebSocket('wss://echo.websocket.org');
+
+    ws.onopen = () => {
+      addMessage('Система', 'Соединение установлено', 'server');
+    };
+
+    ws.onmessage = (event) => {
+      addMessage('Сервер', event.data, 'server');
+    };
+
+    ws.onerror = () => {
+      addMessage('Система', 'Ошибка соединения', 'server');
+    };
+
+    ws.onclose = () => {
+      addMessage('Система', 'Соединение закрыто', 'server');
+    };
+
+    sendBtn.onclick = sendMessage;
+    inputMsg.addEventListener('keydown', e => {
+      if (e.key === 'Enter') sendMessage();
+    });
+
+    function sendMessage() {
+      const msg = inputMsg.value.trim();
+      if (!msg) return;
+      ws.send(msg);
+      addMessage('Я', msg, 'me');
+      inputMsg.value = '';
+      inputMsg.focus();
+    }
+
+    function addMessage(user, msg, cls) {
+      const div = document.createElement('div');
+      div.classList.add('message', cls);
+      div.textContent = `${user}: ${msg}`;
+      messages.appendChild(div);
+      messages.scrollTop = messages.scrollHeight;
+    }
+  </script>
+</body>
+</html>
