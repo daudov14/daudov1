@@ -339,6 +339,7 @@ function newGame() {
       }
       scoreDiv.textContent = `Очки: ${score}`;
       disableOptions();
+      setTimeout(newGame, 2000);
     };
     options.appendChild(btn);
   });
