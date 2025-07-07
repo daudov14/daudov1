@@ -5,18 +5,19 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Арабские слова и игра</title>
 <style>
-body {
-    margin: 0;
-    min-height: 100vh;
-
-    background-image: url('IMG_0836.jpeg); /* путь к картинке */
-    background-size: cover;          /* растянуть картинку */
-    background-position: center;     /* центрировать */
-    background-repeat: no-repeat;    /* не повторять */
-    background-attachment: fixed;    /* фон фиксирован */
-    color: white;                    /* белый текст на фоне */
-    text-shadow: 0 0 5px black;      /* тень текста для читаемости */
-}
+body {margin:0;padding:1rem;font-family:sans-serif;background:#121212;color:#eee;direction:rtl;}
+h1{text-align:center;}
+input,button,select{width:100%;margin:0.5rem 0;padding:0.5rem;font-size:1rem;border:none;border-radius:5px;}
+button{background:#333;color:white;}button:hover{background:#555;}
+.word-list{max-height:200px;overflow-y:auto;border:1px solid #333;padding:0.5rem;margin:1rem 0;}
+.word-item{padding:0.3rem;} 
+.word-item:hover{background:#333;cursor:pointer;}
+.word-item.selected{background:#555;}
+#translation{margin-top:1rem;text-align:center;font-size:1.2rem;}
+.game{margin-top:2rem;border-top:1px solid #333;padding-top:1rem;}
+.options button{margin:0.2rem;width:48%;}
+button:disabled{opacity:0.5;}
+];
 </style>
 </head>
 <body>
