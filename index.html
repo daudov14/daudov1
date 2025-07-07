@@ -1,24 +1,21 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Мой сайт</title>
+  <title>Калькулятор</title>
 </head>
 <body>
-  <h1>Привет, мир!я Жабраил</h1>
-</body>
-</html>
-<!DOCTYPE html>
-<html>
-<head>
-  <meta charset="UTF-8">
-  <title>Мой сайт</title>
-</head>
-<body>
-  <h1>Привет! я Жабраил </h1>
-  <p>Вот моё фото:</p>
+  <h1>Сложение чисел</h1>
+  <input type="number" id="a"> +
+  <input type="number" id="b">
+  <button onclick="calculate()">Посчитать</button>
+  <p>Результат: <span id="result">0</span></p>
 
-  <!-- 📷 Вот эта строка вставляет изображение -->
-  <img src="IMG_0820.jpeg" alt="Часовая башня ночью" width="500">
-
+  <script>
+    function calculate() {
+      const a = parseFloat(document.getElementById('a').value);
+      const b = parseFloat(document.getElementById('b').value);
+      document.getElementById('result').textContent = a + b;
+    }
+  </script>
 </body>
 </html>
