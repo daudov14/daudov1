@@ -1,151 +1,287 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>تعلم العربية</title>
-<style>
-  body {
-    font-family: 'Amiri', serif;
-    background-color: #121212;
-    color: #fff;
-    margin: 0;
-    padding: 0;
-  }
-  header {
-    background-color: #1f1f1f;
-    text-align: center;
-    padding: 20px;
-    font-size: 1.5em;
-  }
-  main {
-    max-width: 800px;
-    margin: auto;
-    padding: 20px;
-  }
-  input {
-    width: 100%;
-    padding: 10px;
-    margin: 10px 0;
-    font-size: 1em;
-    background: #1f1f1f;
-    color: #fff;
-    border: 1px solid #333;
-  }
-  ul {
-    list-style: none;
-    padding: 0;
-  }
-  li {
-    margin: 5px 0;
-    padding: 10px;
-    background: #1f1f1f;
-    border-radius: 4px;
-  }
-  .game {
-    margin-top: 40px;
-    padding: 20px;
-    background: #1f1f1f;
-    border-radius: 4px;
-  }
-  .correct {
-    color: #4CAF50;
-  }
-  .wrong {
-    color: #F44336;
-  }
-</style>
+  <meta charset="UTF-8" />
+  <title>Арабские слова для начинающих</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    body {
+      background-color: #121212;
+      color: #eee;
+      font-family: Arial, sans-serif;
+      margin: 0; padding: 15px;
+      direction: rtl;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+    h1, h2 {
+      text-align: center;
+    }
+    input, button {
+      padding: 10px;
+      font-size: 1rem;
+      border-radius: 5px;
+      border: none;
+      margin: 5px 0;
+      box-sizing: border-box;
+    }
+    input {
+      width: 100%;
+      max-width: 400px;
+      margin: 10px auto;
+      display: block;
+      background-color: #222;
+      color: #eee;
+      border: 1px solid #555;
+    }
+    .word-list {
+      max-height: 250px;
+      overflow-y: auto;
+      border: 1px solid #444;
+      padding: 10px;
+      margin: 15px auto;
+      background: #222;
+      width: 100%;
+      max-width: 400px;
+      border-radius: 8px;
+    }
+    .word-item {
+      padding: 8px 5px;
+      cursor: pointer;
+      border-radius: 4px;
+    }
+    .word-item:hover, .word-item.selected {
+      background: #333;
+    }
+    .translation {
+      text-align: center;
+      margin-top: 10px;
+      font-size: 1.3rem;
+      min-height: 30px;
+    }
+    .game-section {
+      margin-top: 30px;
+      border-top: 1px solid #444;
+      padding-top: 20px;
+      width: 100%;
+      max-width: 400px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    .game-question {
+      font-size: 1.3rem;
+      margin-bottom: 15px;
+      text-align: center;
+    }
+    .game-options {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 10px;
+      margin-bottom: 15px;
+    }
+    .game-options button {
+      flex: 1 1 40%;
+      min-width: 120px;
+      background-color: #333;
+      color: #eee;
+      cursor: pointer;
+      border: none;
+      border-radius: 6px;
+      padding: 12px 0;
+      transition: background-color 0.3s ease;
+      user-select: none;
+    }
+    .game-options button:hover:not(:disabled) {
+      background-color: #555;
+    }
+    .game-options button.selected {
+      background-color: #666;
+    }
+    .result {
+      text-align: center;
+      font-size: 1.2rem;
+      min-height: 30px;
+      margin-bottom: 15px;
+    }
+    #nextGameBtn, #confirmBtn {
+      width: 100%;
+      max-width: 400px;
+      background-color: #0066cc;
+      color: white;
+      font-weight: bold;
+      padding: 12px;
+      border-radius: 8px;
+      cursor: pointer;
+      border: none;
+      margin: 10px auto;
+      display: block;
+      user-select: none;
+      transition: background-color 0.3s ease;
+    }
+    #nextGameBtn:hover:not(:disabled), #confirmBtn:hover:not(:disabled) {
+      background-color: #004999;
+    }
+    #confirmBtn:disabled {
+      background-color: #555;
+      cursor: not-allowed;
+    }
+    @media (max-width: 480px) {
+      .game-options button {
+        flex: 1 1 100%;
+        min-width: auto;
+      }
+      input, #nextGameBtn, #confirmBtn, .word-list {
+        max-width: 100%;
+      }
+    }
+  </style>
 </head>
 <body>
 
-<header>
-  كلمات عربية — تعلم و العب
-</header>
+  <h1>Арабские слова для начинающих</h1>
 
-<main>
-  <h2>📖 Список слов</h2>
-  <input type="text" id="search" placeholder="ابحث عن الكلمة...">
-  <ul id="wordList"></ul>
+  <input type="text" id="search" placeholder="Поиск слова или перевода..." />
 
-  <div class="game">
-    <h2>🎮 Игра: угадай слово</h2>
-    <p id="question"></p>
-    <input type="text" id="answer" placeholder="اكتب الكلمة بالعربية">
-    <p id="result"></p>
+  <div class="word-list" id="wordList" role="list" aria-label="Список слов"></div>
+  <div class="translation" id="translation" aria-live="polite"></div>
+
+  <div class="game-section" aria-label="Игра угадай слово">
+    <h2>Игра: угадай слово на арабском</h2>
+    <div class="game-question" id="gameQuestion" aria-live="polite"></div>
+    <div class="game-options" id="gameOptions" role="list" aria-label="Варианты ответа"></div>
+    <button id="confirmBtn" disabled>Готово</button>
+    <div class="result" id="gameResult" aria-live="polite"></div>
+    <button id="nextGameBtn" disabled>Следующее слово</button>
   </div>
-</main>
 
-<script>
-// 👇 Массив из 500 слов
-const words = [
-  {arabic: "كتاب", translation: "книга"},
-  {arabic: "مدرسة", translation: "школа"},
-  {arabic: "طالب", translation: "студент"},
-  {arabic: "معلم", translation: "учитель"},
-  {arabic: "لغة", translation: "язык"},
-  {arabic: "بيت", translation: "дом"},
-  {arabic: "مدينة", translation: "город"},
-  {arabic: "طاولة", translation: "стол"},
-  {arabic: "كرسي", translation: "стул"},
-  {arabic: "نافذة", translation: "окно"},
-  {arabic: "باب", translation: "дверь"},
-  {arabic: "قلم", translation: "ручка"},
-  {arabic: "ورقة", translation: "лист"},
-  {arabic: "لوح", translation: "доска"},
-  {arabic: "كتاب", translation: "книга"},
-  // … дальше до 500 слов
-];
+  <script src="words.js"></script>
+  <script>
+    const wordListEl = document.getElementById('wordList');
+    const translationEl = document.getElementById('translation');
+    const searchInput = document.getElementById('search');
 
-// 🚀 Вставь сюда ещё слова по этому же формату: {arabic: "...", translation: "..."}
-
-const list = document.getElementById("wordList");
-const search = document.getElementById("search");
-const question = document.getElementById("question");
-const answer = document.getElementById("answer");
-const result = document.getElementById("result");
-
-function showWords(filter="") {
-  list.innerHTML = "";
-  words.filter(w => 
-    w.arabic.includes(filter) || w.translation.includes(filter)
-  ).forEach(w => {
-    const li = document.createElement("li");
-    li.textContent = `${w.arabic} — ${w.translation}`;
-    list.appendChild(li);
-  });
-}
-
-search.addEventListener("input", () => {
-  showWords(search.value.trim());
-});
-
-showWords();
-
-// 🎮 Игра
-let currentWord = null;
-
-function nextQuestion() {
-  result.textContent = "";
-  answer.value = "";
-  currentWord = words[Math.floor(Math.random() * words.length)];
-  question.textContent = `Как по-арабски: ${currentWord.translation}?`;
-}
-
-answer.addEventListener("keydown", e => {
-  if (e.key === "Enter") {
-    if (answer.value.trim() === currentWord.arabic) {
-      result.textContent = "✅ Правильно!";
-      result.className = "correct";
-    } else {
-      result.textContent = `❌ Неправильно. Правильно: ${currentWord.arabic}`;
-      result.className = "wrong";
+    function renderWords(filter = '') {
+      wordListEl.innerHTML = '';
+      const filtered = words.filter(w =>
+        w.arabic.includes(filter) || w.translation.includes(filter)
+      );
+      filtered.forEach(w => {
+        const div = document.createElement('div');
+        div.textContent = w.arabic;
+        div.className = 'word-item';
+        div.tabIndex = 0;
+        div.onclick = () => {
+          translationEl.textContent = `Перевод: ${w.translation}`;
+          playAudio(w.arabic);
+        };
+        div.onkeypress = (e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            div.click();
+          }
+        }
+        wordListEl.appendChild(div);
+      });
+      if (filtered.length === 0) {
+        wordListEl.textContent = 'Слова не найдены';
+        translationEl.textContent = '';
+      }
     }
-    setTimeout(nextQuestion, 2000);
-  }
-});
 
-nextQuestion();
-</script>
+    searchInput.addEventListener('input', () => {
+      renderWords(searchInput.value.trim());
+      translationEl.textContent = '';
+    });
 
+    // --- Игра ---
+    const gameQuestionEl = document.getElementById('gameQuestion');
+    const gameOptionsEl = document.getElementById('gameOptions');
+    const gameResultEl = document.getElementById('gameResult');
+    const nextGameBtn = document.getElementById('nextGameBtn');
+    const confirmBtn = document.getElementById('confirmBtn');
+
+    let currentGameWord = null;
+    let selectedOption = null;
+
+    function shuffle(arr) {
+      for (let i = arr.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+      }
+      return arr;
+    }
+
+    function playAudio(text) {
+      if (!('speechSynthesis' in window)) return;
+      speechSynthesis.cancel(); // остановить предыдущую речь
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.lang = 'ar-SA'; // арабский язык
+      speechSynthesis.speak(utterance);
+    }
+
+    function startGame() {
+      gameResultEl.textContent = '';
+      selectedOption = null;
+      confirmBtn.disabled = true;
+      nextGameBtn.disabled = true;
+
+      currentGameWord = words[Math.floor(Math.random() * words.length)];
+      gameQuestionEl.textContent = `Выберите слово на арабском для перевода: "${currentGameWord.translation}"`;
+      playAudio(currentGameWord.arabic);
+
+      let options = [currentGameWord];
+      while (options.length < 4) {
+        const randomWord = words[Math.floor(Math.random() * words.length)];
+        if (!options.includes(randomWord)) {
+          options.push(randomWord);
+        }
+      }
+
+      shuffle(options);
+
+      gameOptionsEl.innerHTML = '';
+      options.forEach(option => {
+        const btn = document.createElement('button');
+        btn.textContent = option.arabic;
+        btn.type = 'button';
+        btn.onclick = () => {
+          if (selectedOption) {
+            // убрать выделение с предыдущей
+            selectedOption.classList.remove('selected');
+          }
+          selectedOption = btn;
+          btn.classList.add('selected');
+          confirmBtn.disabled = false;
+          playAudio(option.arabic);
+        };
+        gameOptionsEl.appendChild(btn);
+      });
+    }
+
+    confirmBtn.onclick = () => {
+      if (!selectedOption) return;
+      const chosenWord = words.find(w => w.arabic === selectedOption.textContent);
+      if (chosenWord === currentGameWord) {
+        gameResultEl.textContent = 'Верно! 🎉';
+        gameResultEl.style.color = '#0f0';
+      } else {
+        gameResultEl.textContent = `Неверно. Правильный ответ: ${currentGameWord.arabic}`;
+        gameResultEl.style.color = '#f44';
+      }
+      // Заблокировать кнопки вариантов
+      [...gameOptionsEl.children].forEach(b => b.disabled = true);
+      confirmBtn.disabled = true;
+      nextGameBtn.disabled = false;
+    };
+
+    nextGameBtn.onclick = () => {
+      startGame();
+    };
+
+    // Инициализация
+    renderWords();
+    startGame();
+  </script>
 </body>
 </html>
