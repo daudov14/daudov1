@@ -300,48 +300,71 @@ function startTimer() {
   timer = setInterval(()=>{
     timeLeft--;
     timerDiv.textContent = `⏳ ${timeLeft}`;
-    if(timeLeft<=0){
-      clearInterval(timer);
-      result.textContent=`⏱️ Время вышло! Правильный ответ: ${lastCorrectAnswer}`;
-      disableOptions();
-    }
-  },1000);
+    if (timeLeft <= 0) {
+  clearInterval(timer);
+  result.textContent = ⁠ ⏱️ Время вышло! Правильный ответ: ${lastCorrectAnswer} ⁠;
+  disableOptions();
+  setTimeout(newGame, 2000); // ✅ автообновление
 }
 
 function newGame() {
-  if(result.textContent.includes('❌') || result.textContent.includes('⏱️')) {
+    if (result.textContent.includes('❌') || result.textContent.includes('⏱️')) {
     result.textContent += ` Правильный ответ: ${lastCorrectAnswer}`;
   } else {
     result.textContent = '';
   }
+
   buildPool();
-  const word = gamePool[Math.floor(Math.random()*gamePool.length)];
-  question.textContent = `Как переводится: ${word.translation}?`;
+
+  const word = gamePool[Math.floor(Math.random() * gamePool.length)];
+  question.textContent = ⁠ Как переводится: ${word.translation}? ⁠;
   lastCorrectAnswer = word.arabic;
 
   const choices = new Set([word.arabic]);
-  while(choices.size<4) {
-    choices.add(gamePool[Math.floor(Math.random()*gamePool.length)].arabic);
+  while (choices.size < 4) {
+    choices.add(gamePool[Math.floor(Math.random() * gamePool.length)].arabic);
   }
 
+  // очищаем кнопки
   options.innerHTML = '';
-  Array.from(choices).sort(()=>Math.random()-0.5).forEach(choice => {
+
+  Array.from(choices).sort(() => Math.random() - 0.5).forEach(choice => {
     const btn = document.createElement('button');
     btn.textContent = choice;
     btn.setAttribute('role', 'button');
+
     btn.onclick = () => {
       clearInterval(timer);
-      if(choice===word.arabic) {
-        result.textContent='✅ Верно!';
-        score++;
-      } else {
-        result.textContent=`❌ Неверно. Правильный ответ: ${word.arabic}`;
-      }
-      scoreDiv.textContent = `Очки: ${score}`;
-      disableOptions();
-      setTimeout(newGame, 2000);
-    };
+
+      // ❌ снимаем выделение со всех кнопок
+      options.querySelectorAll('button').forEach(b => {
+        b.classList.remove('selected');
+      });
+
+      // ✅ добавляем выделение на текущую
+      btn.classList.add('selected');
+
+     if (choice === word.arabic) {
+  result.textContent = '✅ Верно!';
+  score++;
+} else {
+  result.textContent = ⁠ ❌ Неверно. Правильный ответ: ${word.arabic} ⁠;
+}
+
+scoreDiv.textContent = ⁠ Очки: ${score} ⁠;
+disableOptions();
+
+// ⏳ автообновление через 2 секунды
+setTimeout(newGame, 2000);    };
+
     options.appendChild(btn);
+  });
+
+  // ✅ снимаем фокус и сбрасываем состояние кнопок на старте
+  options.querySelectorAll('button').forEach(btn => {
+    btn.disabled = false;
+    btn.blur();
+    btn.classList.remove('selected');
   });
   startTimer();
 }
