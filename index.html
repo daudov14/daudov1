@@ -244,3 +244,138 @@
   }
   themeToggle.onclick = () => {
     const current =
+themeToggle.onclick = () => {
+    const current = document.body.dataset.theme;
+    const next = current === 'dark' ? 'light' : 'dark';
+    document.body.dataset.theme = next;
+    localStorage.setItem('theme', next);
+};
+
+loadTheme();
+
+// --- Отобразить категории ---
+const categorySelect = document.getElementById('categorySelect');
+const wordList = document.getElementById('wordList');
+const translationDiv = document.getElementById('translation');
+const wordImg = document.getElementById('wordImg');
+const playAudioBtn = document.getElementById('playAudioBtn');
+const searchInput = document.getElementById('search');
+
+const categories = [...new Set(words.map(w => w.category))];
+categories.forEach(cat => {
+    const opt = document.createElement('option');
+    opt.value = cat;
+    opt.textContent = cat;
+    categorySelect.appendChild(opt);
+});
+
+function renderWords() {
+    const query = searchInput.value.trim().toLowerCase();
+    const cat = categorySelect.value;
+
+    wordList.innerHTML = '';
+    translationDiv.textContent = '';
+    wordImg.style.display = 'none';
+    playAudioBtn.style.display = 'none';
+
+    const filtered = words.filter(w =>
+        (!cat || w.category === cat) &&
+        (w.arabic.includes(query) || w.translation.includes(query))
+    );
+
+    filtered.forEach(w => {
+        const div = document.createElement('div');
+        div.className = 'word-item';
+        div.textContent = w.arabic + ' - ' + w.translation;
+        div.onclick = () => {
+            translationDiv.textContent = `${w.translation} (${w.category})`;
+            wordImg.src = w.img;
+            wordImg.style.display = 'block';
+            playAudioBtn.onclick = () => {
+                const audio = new Audio(w.audio);
+                audio.play();
+            };
+            playAudioBtn.style.display = 'block';
+        };
+        wordList.appendChild(div);
+    });
+}
+
+searchInput.oninput = renderWords;
+categorySelect.onchange = renderWords;
+
+renderWords();
+
+// --- Игра ---
+const gameQuestion = document.getElementById('gameQuestion');
+const gameOptions = document.getElementById('gameOptions');
+const confirmBtn = document.getElementById('confirmBtn');
+const gameResult = document.getElementById('gameResult');
+const nextGameBtn = document.getElementById('nextGameBtn');
+const gameTypeSelect = document.getElementById('gameTypeSelect');
+const gameLevelSelect = document.getElementById('gameLevelSelect');
+
+let correctAnswer = null;
+let selectedOption = null;
+
+function startGame() {
+    gameResult.textContent = '';
+    confirmBtn.disabled = true;
+    nextGameBtn.disabled = true;
+    selectedOption = null;
+
+    let levelCount = 100;
+    if (gameLevelSelect.value === '2') levelCount = 300;
+    if (gameLevelSelect.value === '3') levelCount = words.length;
+
+    const pool = words.slice(0, Math.min(levelCount, words.length));
+    const questionWord = pool[Math.floor(Math.random() * pool.length)];
+
+    const isArabic = gameTypeSelect.value === 'arabic';
+
+    gameQuestion.textContent = isArabic
+        ? `Как переводится: ${questionWord.translation}?`
+        : `Как звучит по-арабски: ${questionWord.arabic}?`;
+
+    correctAnswer = isArabic ? questionWord.arabic : questionWord.translation;
+
+    const optionsSet = new Set();
+    optionsSet.add(correctAnswer);
+
+    while (optionsSet.size < 4) {
+        const rand = pool[Math.floor(Math.random() * pool.length)];
+        optionsSet.add(isArabic ? rand.arabic : rand.translation);
+    }
+
+    const options = Array.from(optionsSet).sort(() => Math.random() - 0.5);
+
+    gameOptions.innerHTML = '';
+    options.forEach(opt => {
+        const btn = document.createElement('button');
+        btn.textContent = opt;
+        btn.onclick = () => {
+            [...gameOptions.children].forEach(b => b.classList.remove('selected'));
+            btn.classList.add('selected');
+            selectedOption = opt;
+            confirmBtn.disabled = false;
+        };
+        gameOptions.appendChild(btn);
+    });
+}
+
+confirmBtn.onclick = () => {
+    if (!selectedOption) return;
+    if (selectedOption === correctAnswer) {
+        gameResult.textContent = '✅ Верно!';
+    } else {
+        gameResult.textContent = `❌ Неверно. Правильный ответ: ${correctAnswer}`;
+    }
+    nextGameBtn.disabled = false;
+    confirmBtn.disabled = true;
+};
+
+nextGameBtn.onclick = () => {
+    startGame();
+};
+
+startGame();
