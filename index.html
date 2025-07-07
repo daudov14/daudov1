@@ -2,155 +2,153 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Крестики-нолики</title>
   <style>
     body {
-      font-family: Arial, sans-serif;
-      text-align: center;
-      margin-top: 40px;
+      margin: 0;
+      padding: 0;
+      background-color: #000;
+      color: #fff;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      min-height: 100vh;
+      padding-top: 40px;
     }
-    table {
-      margin: 0 auto;
-      border-collapse: collapse;
+
+    h1 {
+      margin-bottom: 20px;
     }
-    td {
-      width: 60px;
-      height: 60px;
-      border: 2px solid #333;
-      font-size: 48px;
+
+    #game {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 5px;
+      width: 90vmin;
+      max-width: 300px;
+    }
+
+    .cell {
+      width: 100%;
+      aspect-ratio: 1 / 1;
+      background-color: #111;
+      border: 2px solid #555;
+      font-size: 2.5em;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
       cursor: pointer;
-      user-select: none;
+      transition: background-color 0.3s;
     }
-    td:hover {
-      background-color: #f0f0f0;
+
+    .cell:hover {
+      background-color: #222;
     }
-    #message {
-      margin-top: 20px;
-      font-size: 20px;
-      font-weight: bold;
+
+    #status {
+      margin: 20px 0;
+      font-size: 1.2em;
     }
+
     button {
-      margin-top: 20px;
-      padding: 8px 16px;
-      font-size: 16px;
+      background-color: #333;
+      color: #fff;
+      border: none;
+      padding: 10px 20px;
+      font-size: 1em;
+      border-radius: 5px;
       cursor: pointer;
+      transition: background-color 0.3s;
+    }
+
+    button:hover {
+      background-color: #555;
+    }
+
+    @media (max-width: 480px) {
+      h1 {
+        font-size: 1.5em;
+      }
+
+      #status {
+        font-size: 1em;
+      }
+
+      .cell {
+        font-size: 2em;
+      }
     }
   </style>
 </head>
 <body>
-
   <h1>Крестики-нолики</h1>
-  <table id="board">
-    <tr>
-      <td data-row="0" data-col="0"></td>
-      <td data-row="0" data-col="1"></td>
-      <td data-row="0" data-col="2"></td>
-    </tr>
-    <tr>
-      <td data-row="1" data-col="0"></td>
-      <td data-row="1" data-col="1"></td>
-      <td data-row="1" data-col="2"></td>
-    </tr>
-    <tr>
-      <td data-row="2" data-col="0"></td>
-      <td data-row="2" data-col="1"></td>
-      <td data-row="2" data-col="2"></td>
-    </tr>
-  </table>
-
-  <div id="message">Ход игрока X</div>
-  <button id="restartBtn">Начать заново</button>
+  <div id="game">
+    <div class="cell" data-index="0"></div>
+    <div class="cell" data-index="1"></div>
+    <div class="cell" data-index="2"></div>
+    <div class="cell" data-index="3"></div>
+    <div class="cell" data-index="4"></div>
+    <div class="cell" data-index="5"></div>
+    <div class="cell" data-index="6"></div>
+    <div class="cell" data-index="7"></div>
+    <div class="cell" data-index="8"></div>
+  </div>
+  <p id="status">Ходит: X</p>
+  <button onclick="restartGame()">Начать заново</button>
 
   <script>
-    const boardElement = document.getElementById('board');
-    const messageElement = document.getElementById('message');
-    const restartBtn = document.getElementById('restartBtn');
-
-    let board = [
-      ['', '', ''],
-      ['', '', ''],
-      ['', '', '']
-    ];
-
-    let currentPlayer = 'X';
+    let currentPlayer = "X";
+    let board = ["", "", "", "", "", "", "", "", ""];
     let gameActive = true;
+
+    const statusText = document.getElementById("status");
+    const cells = document.querySelectorAll(".cell");
+
+    function handleCellClick(e) {
+      const index = e.target.getAttribute("data-index");
+
+      if (board[index] !== "" || !gameActive) return;
+
+      board[index] = currentPlayer;
+      e.target.textContent = currentPlayer;
+
+      if (checkWinner()) {
+        statusText.textContent = `Победил: ${currentPlayer}`;
+        gameActive = false;
+      } else if (board.every(cell => cell !== "")) {
+        statusText.textContent = "Ничья!";
+        gameActive = false;
+      } else {
+        currentPlayer = currentPlayer === "X" ? "O" : "X";
+        statusText.textContent = `Ходит: ${currentPlayer}`;
+      }
+    }
 
     function checkWinner() {
       const winConditions = [
-        // строки
-        [[0,0], [0,1], [0,2]],
-        [[1,0], [1,1], [1,2]],
-        [[2,0], [2,1], [2,2]],
-        // столбцы
-        [[0,0], [1,0], [2,0]],
-        [[0,1], [1,1], [2,1]],
-        [[0,2], [1,2], [2,2]],
-        // диагонали
-        [[0,0], [1,1], [2,2]],
-        [[0,2], [1,1], [2,0]],
+        [0,1,2], [3,4,5], [6,7,8],
+        [0,3,6], [1,4,7], [2,5,8],
+        [0,4,8], [2,4,6]
       ];
 
-      for (let condition of winConditions) {
-        const [a, b, c] = condition;
-        if (board[a[0]][a[1]] &&
-            board[a[0]][a[1]] === board[b[0]][b[1]] &&
-            board[a[0]][a[1]] === board[c[0]][c[1]]) {
-          return board[a[0]][a[1]];
-        }
-      }
-      return null;
-    }
-
-    function boardFull() {
-      return board.flat().every(cell => cell !== '');
-    }
-
-    function handleCellClick(e) {
-      if (!gameActive) return;
-
-      const row = parseInt(e.target.getAttribute('data-row'));
-      const col = parseInt(e.target.getAttribute('data-col'));
-
-      if (board[row][col] !== '') return;
-
-      board[row][col] = currentPlayer;
-      e.target.textContent = currentPlayer;
-
-      const winner = checkWinner();
-
-      if (winner) {
-        messageElement.textContent = `Победил игрок ${winner}!`;
-        gameActive = false;
-        return;
-      }
-
-      if (boardFull()) {
-        messageElement.textContent = 'Ничья!';
-        gameActive = false;
-        return;
-      }
-
-      currentPlayer = currentPlayer === 'X' ? 'O' : 'X';
-      messageElement.textContent = `Ход игрока ${currentPlayer}`;
-    }
-
-    function restartGame() {
-      board = [
-        ['', '', ''],
-        ['', '', ''],
-        ['', '', '']
-      ];
-      currentPlayer = 'X';
-      gameActive = true;
-      messageElement.textContent = `Ход игрока ${currentPlayer}`;
-      Array.from(boardElement.getElementsByTagName('td')).forEach(cell => {
-        cell.textContent = '';
+      return winConditions.some(([a, b, c]) => {
+        return board[a] && board[a] === board[b] && board[a] === board[c];
       });
     }
 
-    boardElement.addEventListener('click', handleCellClick);
-    restartBtn.addEventListener('click', restartGame);
-  </script>
+    function restartGame() {
+      board = ["", "", "", "", "", "", "", "", ""];
+      currentPlayer = "X";
+      gameActive = true;
+      statusText.textContent = "Ходит: X";
+      cells.forEach(cell => (cell.textContent = ""));
+    }
 
+    cells.forEach(cell => cell.addEventListener("click", handleCellClick));
+  </script>
 </body>
 </html>
