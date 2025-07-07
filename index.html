@@ -294,20 +294,20 @@ function buildPool() {
 }
 
 function startTimer() {
-  clearInterval(timer);
+   clearInterval(timer);
   timeLeft = 25;
-  timerDiv.textContent = `⏳ ${timeLeft}`;
-  timer = setInterval(()=>{
+  timerDiv.textContent = ⁠ ⏳ ${timeLeft} ⁠;
+  timer = setInterval(() => {
     timeLeft--;
-    timerDiv.textContent = `⏳ ${timeLeft}`;
+    timerDiv.textContent = ⁠ ⏳ ${timeLeft} ⁠;
     if (timeLeft <= 0) {
-  clearInterval(timer);
-  result.textContent = ⁠ ⏱️ Время вышло! Правильный ответ: ${lastCorrectAnswer} ⁠;
-  disableOptions();
-  setTimeout(newGame, 2000); // ✅ автообновление
-}
-
-function newGame() {
+      clearInterval(timer);
+      result.textContent = ⁠ ⏱️ Время вышло! Правильный ответ: ${lastCorrectAnswer} ⁠;
+      disableOptions();
+    }
+  }, 1000);
+]
+ function newGame() {
     if (result.textContent.includes('❌') || result.textContent.includes('⏱️')) {
     result.textContent += ` Правильный ответ: ${lastCorrectAnswer}`;
   } else {
