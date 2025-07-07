@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <title>Крестики-нолики</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      margin-top: 40px;
+    }
+    table {
+      margin: 0 auto;
+      border-collapse: collapse;
+    }
+    td {
+      width: 60px;
+      height: 60px;
+      border: 2px solid #333;
+      font-size: 48px;
+      cursor: pointer;
+      user-select: none;
+    }
+    td:hover {
+      background-color: #f0f0f0;
+    }
+    #message {
+      margin-top: 20px;
+      font-size: 20px;
+      font-weight: bold;
+    }
+    button {
+      margin-top: 20px;
+      padding: 8px 16px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Крестики-нолики</h1>
+  <table id="board">
+    <tr>
+      <td data-row="0" data-col="0"></td>
+      <td data-row="0" data-col="1"></td>
+      <td data-row="0" data-col="2"></td>
+    </tr>
+    <tr>
+      <td data-row="1" data-col="0"></td>
+      <td data-row="1" data-col="1"></td>
+      <td data-row="1" data-col="2"></td>
+    </tr>
+    <tr>
+      <td data-row="2" data-col="0"></td>
+      <td data-row="2" data-col="1"></td>
+      <td data-row="2" data-col="2"></td>
+    </tr>
+  </table>
+
+  <div id="message">Ход игрока X</div>
+  <button id="restartBtn">Начать заново</button>
+
+  <script>
+    const boardElement = document.getElementById('board');
+    const messageElement = document.getElementById('message');
+    const restartBtn = document.getElementById('restartBtn');
+
+    let board = [
+      ['', '', ''],
+      ['', '', ''],
+      ['', '', '']
+    ];
+
+    let currentPlayer = 'X';
+    let gameActive = true;
+
+    function checkWinner() {
+      const winConditions = [
+        // строки
+        [[0,0], [0,1], [0,2]],
+        [[1,0], [1,1], [1,2]],
+        [[2,0], [2,1], [2,2]],
+        // столбцы
+        [[0,0], [1,0], [2,0]],
+        [[0,1], [1,1], [2,1]],
+        [[0,2], [1,2], [2,2]],
+        // диагонали
+        [[0,0], [1,1], [2,2]],
+        [[0,2], [1,1], [2,0]],
+      ];
+
+      for (let condition of winConditions) {
+        const [a, b, c] = condition;
+        if (board[a[0]][a[1]] &&
+            board[a[0]][a[1]] === board[b[0]][b[1]] &&
+            board[a[0]][a[1]] === board[c[0]][c[1]]) {
+          return board[a[0]][a[1]];
+        }
+      }
+      return null;
+    }
+
+    function boardFull() {
+      return board.flat().every(cell => cell !== '');
+    }
+
+    function handleCellClick(e) {
+      if (!gameActive) return;
+
+      const row = parseInt(e.target.getAttribute('data-row'));
+      const col = parseInt(e.target.getAttribute('data-col'));
+
+      if (board[row][col] !== '') return;
+
+      board[row][col] = currentPlayer;
+      e.target.textContent = currentPlayer;
+
+      const winner = checkWinner();
+
+      if (winner) {
+        messageElement.textContent = `Победил игрок ${winner}!`;
+        gameActive = false;
+        return;
+      }
+
+      if (boardFull()) {
+        messageElement.textContent = 'Ничья!';
+        gameActive = false;
+        return;
+      }
+
+      currentPlayer = currentPlayer === 'X' ? 'O' : 'X';
+      messageElement.textContent = `Ход игрока ${currentPlayer}`;
+    }
+
+    function restartGame() {
+      board = [
+        ['', '', ''],
+        ['', '', ''],
+        ['', '', '']
+      ];
+      currentPlayer = 'X';
+      gameActive = true;
+      messageElement.textContent = `Ход игрока ${currentPlayer}`;
+      Array.from(boardElement.getElementsByTagName('td')).forEach(cell => {
+        cell.textContent = '';
+      });
+    }
+
+    boardElement.addEventListener('click', handleCellClick);
+    restartBtn.addEventListener('click', restartGame);
+  </script>
+
+</body>
+</html>
