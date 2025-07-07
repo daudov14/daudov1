@@ -2,86 +2,95 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8" />
-  <title>Простой Мессенджер</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Галерея моих фото</title>
   <style>
     body {
       font-family: Arial, sans-serif;
-      max-width: 500px;
-      margin: 30px auto;
-      padding: 10px;
-      border: 1px solid #ccc;
+      margin: 20px;
+      background: #f0f0f0;
+    }
+    h1 {
+      text-align: center;
+      color: #333;
+    }
+    .gallery {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      justify-content: center;
+    }
+    .gallery img {
+      max-width: 200px;
       border-radius: 8px;
+      box-shadow: 0 0 6px rgba(0,0,0,0.3);
+      cursor: pointer;
+      transition: transform 0.2s;
     }
-    #messages {
-      height: 300px;
-      overflow-y: auto;
-      border: 1px solid #ddd;
-      padding: 10px;
-      margin-bottom: 10px;
-      background: #f9f9f9;
+    .gallery img:hover {
+      transform: scale(1.05);
     }
-    .message {
-      margin-bottom: 8px;
+    /* Модальное окно */
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 9999;
+      left: 0;
+      top: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(0,0,0,0.8);
+      align-items: center;
+      justify-content: center;
     }
-    .me {
-      color: blue;
+    .modal img {
+      max-width: 90%;
+      max-height: 90%;
+      border-radius: 10px;
     }
-    .server {
-      color: green;
+    .modal:target {
+      display: flex;
+    }
+    .close-btn {
+      position: fixed;
+      top: 20px;
+      right: 30px;
+      font-size: 30px;
+      color: white;
+      text-decoration: none;
+      font-weight: bold;
+      cursor: pointer;
     }
   </style>
 </head>
 <body>
 
-  <h2>Простой Мессенджер</h2>
-  <div id="messages"></div>
-  <input type="text" id="inputMsg" placeholder="Введите сообщение" style="width: 80%;" />
-  <button id="sendBtn">Отправить</button>
+<h1>Галерея моих фото</h1>
 
-  <script>
-    const messages = document.getElementById('messages');
-    const inputMsg = document.getElementById('inputMsg');
-    const sendBtn = document.getElementById('sendBtn');
+<div class="gallery">
+  <a href="#img1"><img src="images/photo1.jpg" alt="Фото 1" /></a>
+  <a href="#img2"><img src="images/photo2.jpg" alt="Фото 2" /></a>
+  <a href="#img3"><img src="images/photo3.jpg" alt="Фото 3" /></a>
+  <a href="#img4"><img src="images/photo4.jpg" alt="Фото 4" /></a>
+</div>
 
-    const ws = new WebSocket('wss://echo.websocket.org');
+<!-- Модальные окна для увеличенного просмотра -->
+<div id="img1" class="modal">
+  <a href="#" class="close-btn">&times;</a>
+  <img src="images/photo1.jpg" alt="Фото 1" />
+</div>
+<div id="img2" class="modal">
+  <a href="#" class="close-btn">&times;</a>
+  <img src="images/photo2.jpg" alt="Фото 2" />
+</div>
+<div id="img3" class="modal">
+  <a href="#" class="close-btn">&times;</a>
+  <img src="images/photo3.jpg" alt="Фото 3" />
+</div>
+<div id="img4" class="modal">
+  <a href="#" class="close-btn">&times;</a>
+  <img src="images/photo4.jpg" alt="Фото 4" />
+</div>
 
-    ws.onopen = () => {
-      addMessage('Система', 'Соединение установлено', 'server');
-    };
-
-    ws.onmessage = (event) => {
-      addMessage('Сервер', event.data, 'server');
-    };
-
-    ws.onerror = () => {
-      addMessage('Система', 'Ошибка соединения', 'server');
-    };
-
-    ws.onclose = () => {
-      addMessage('Система', 'Соединение закрыто', 'server');
-    };
-
-    sendBtn.onclick = sendMessage;
-    inputMsg.addEventListener('keydown', e => {
-      if (e.key === 'Enter') sendMessage();
-    });
-
-    function sendMessage() {
-      const msg = inputMsg.value.trim();
-      if (!msg) return;
-      ws.send(msg);
-      addMessage('Я', msg, 'me');
-      inputMsg.value = '';
-      inputMsg.focus();
-    }
-
-    function addMessage(user, msg, cls) {
-      const div = document.createElement('div');
-      div.classList.add('message', cls);
-      div.textContent = `${user}: ${msg}`;
-      messages.appendChild(div);
-      messages.scrollTop = messages.scrollHeight;
-    }
-  </script>
 </body>
 </html>
