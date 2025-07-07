@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>تعلم العربية</title>
+<style>
+  body {
+    font-family: 'Amiri', serif;
+    background-color: #121212;
+    color: #fff;
+    margin: 0;
+    padding: 0;
+  }
+  header {
+    background-color: #1f1f1f;
+    text-align: center;
+    padding: 20px;
+    font-size: 1.5em;
+  }
+  main {
+    max-width: 800px;
+    margin: auto;
+    padding: 20px;
+  }
+  input {
+    width: 100%;
+    padding: 10px;
+    margin: 10px 0;
+    font-size: 1em;
+    background: #1f1f1f;
+    color: #fff;
+    border: 1px solid #333;
+  }
+  ul {
+    list-style: none;
+    padding: 0;
+  }
+  li {
+    margin: 5px 0;
+    padding: 10px;
+    background: #1f1f1f;
+    border-radius: 4px;
+  }
+  .game {
+    margin-top: 40px;
+    padding: 20px;
+    background: #1f1f1f;
+    border-radius: 4px;
+  }
+  .correct {
+    color: #4CAF50;
+  }
+  .wrong {
+    color: #F44336;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  كلمات عربية — تعلم و العب
+</header>
+
+<main>
+  <h2>📖 Список слов</h2>
+  <input type="text" id="search" placeholder="ابحث عن الكلمة...">
+  <ul id="wordList"></ul>
+
+  <div class="game">
+    <h2>🎮 Игра: угадай слово</h2>
+    <p id="question"></p>
+    <input type="text" id="answer" placeholder="اكتب الكلمة بالعربية">
+    <p id="result"></p>
+  </div>
+</main>
+
+<script>
+// 👇 Массив из 500 слов
+const words = [
+  {arabic: "كتاب", translation: "книга"},
+  {arabic: "مدرسة", translation: "школа"},
+  {arabic: "طالب", translation: "студент"},
+  {arabic: "معلم", translation: "учитель"},
+  {arabic: "لغة", translation: "язык"},
+  {arabic: "بيت", translation: "дом"},
+  {arabic: "مدينة", translation: "город"},
+  {arabic: "طاولة", translation: "стол"},
+  {arabic: "كرسي", translation: "стул"},
+  {arabic: "نافذة", translation: "окно"},
+  {arabic: "باب", translation: "дверь"},
+  {arabic: "قلم", translation: "ручка"},
+  {arabic: "ورقة", translation: "лист"},
+  {arabic: "لوح", translation: "доска"},
+  {arabic: "كتاب", translation: "книга"},
+  // … дальше до 500 слов
+];
+
+// 🚀 Вставь сюда ещё слова по этому же формату: {arabic: "...", translation: "..."}
+
+const list = document.getElementById("wordList");
+const search = document.getElementById("search");
+const question = document.getElementById("question");
+const answer = document.getElementById("answer");
+const result = document.getElementById("result");
+
+function showWords(filter="") {
+  list.innerHTML = "";
+  words.filter(w => 
+    w.arabic.includes(filter) || w.translation.includes(filter)
+  ).forEach(w => {
+    const li = document.createElement("li");
+    li.textContent = `${w.arabic} — ${w.translation}`;
+    list.appendChild(li);
+  });
+}
+
+search.addEventListener("input", () => {
+  showWords(search.value.trim());
+});
+
+showWords();
+
+// 🎮 Игра
+let currentWord = null;
+
+function nextQuestion() {
+  result.textContent = "";
+  answer.value = "";
+  currentWord = words[Math.floor(Math.random() * words.length)];
+  question.textContent = `Как по-арабски: ${currentWord.translation}?`;
+}
+
+answer.addEventListener("keydown", e => {
+  if (e.key === "Enter") {
+    if (answer.value.trim() === currentWord.arabic) {
+      result.textContent = "✅ Правильно!";
+      result.className = "correct";
+    } else {
+      result.textContent = `❌ Неправильно. Правильно: ${currentWord.arabic}`;
+      result.className = "wrong";
+    }
+    setTimeout(nextQuestion, 2000);
+  }
+});
+
+nextQuestion();
+</script>
+
+</body>
+</html>
