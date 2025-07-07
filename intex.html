@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Учёт рассрочек</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      padding: 30px;
+      background-color: #f0f0f0;
+      max-width: 900px;
+      margin: auto;
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    label {
+      display: block;
+      margin-top: 10px;
+      font-weight: bold;
+    }
+
+    input {
+      width: 100%;
+      padding: 8px;
+      font-size: 16px;
+      margin-top: 5px;
+    }
+
+    button {
+      margin-top: 20px;
+      padding: 12px;
+      width: 100%;
+      font-size: 18px;
+      background-color: #28a745;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #218838;
+    }
+
+    table {
+      margin-top: 30px;
+      width: 100%;
+      border-collapse: collapse;
+      background: white;
+    }
+
+    th, td {
+      padding: 10px;
+      border: 1px solid #ccc;
+      text-align: center;
+    }
+
+    th {
+      background-color: #007bff;
+      color: white;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Клиенты и рассрочки</h1>
+
+  <label for="client">Имя клиента:</label>
+  <input type="text" id="client" placeholder="Иван Иванов">
+
+  <label for="amount">Сумма (₽):</label>
+  <input type="number" id="amount" placeholder="100000">
+
+  <label for="months">Срок (мес.):</label>
+  <input type="number" id="months" placeholder="12">
+
+  <label for="rate">Процент (% годовых):</label>
+  <input type="number" id="rate" placeholder="10">
+
+  <button onclick="saveEntry()">Сохранить клиента</button>
+
+  <table id="clientsTable">
+    <thead>
+      <tr>
+        <th>Клиент</th>
+        <th>Сумма (₽)</th>
+        <th>Срок (мес.)</th>
+        <th>Процент (%)</th>
+        <th>Платёж (₽)</th>
+        <th>Итого (₽)</th>
+        <th>Переплата (₽)</th>
+      </tr>
+    </thead>
+    <tbody id="tableBody">
+    </tbody>
+  </table>
+
+  <script>
+    function calculateInstallment(amount, months, rate) {
+      const r = rate / 100 / 12;
+      if (r === 0) {
+        return {
+          monthly: amount / months,
+          total: amount,
+          overpay: 0
+        };
+      } else {
+        const monthlyPayment = amount * (r * Math.pow(1 + r, months)) / (Math.pow(1 + r, months) - 1);
+        const total = monthlyPayment * months;
+        const overpay = total - amount;
+        return {
+          monthly: monthlyPayment,
+          total: total,
+          overpay: overpay
+        };
+      }
+    }
+
+    function saveEntry() {
+      const client = document.getElementById('client').value.trim();
+      const amount = parseFloat(document.getElementById('amount').value);
+      const months = parseInt(document.getElementById('months').value);
+      const rate = parseFloat(document.getElementById('rate').value);
+
+      if (!client || isNaN(amount) || isNaN(months) || months <= 0) {
+        alert("Пожалуйста, заполните все поля корректно.");
+        return;
+      }
+
+      const result = calculateInstallment(amount, months, rate);
+
+      const row = document.createElement('tr');
+      row.innerHTML = `
+        <td>${client}</td>
+        <td>${amount.toFixed(2)}</td>
+        <td>${months}</td>
+        <td>${rate}%</td>
+        <td>${result.monthly.toFixed(2)}</td>
+        <td>${result.total.toFixed(2)}</td>
+        <td>${result.overpay.toFixed(2)}</td>
+      `;
+
+      document.getElementById('tableBody').appendChild(row);
+
+      // Очистить поля
+      document.getElementById('client').value = '';
+      document.getElementById('amount').value = '';
+      document.getElementById('months').value = '';
+      document.getElementById('rate').value = '';
+    }
+  </script>
+
+</body>
+</html>
