@@ -135,9 +135,13 @@ function selectWord(div, word) {
   translation.textContent = `${word.arabic} — ${word.translation}`;
   playAudio.style.display = 'inline-block';
   playAudio.onclick = () => {
-    const audio = new Audio(`https://translate.google.com/translate_tts?ie=UTF-8&tl=ar&q=${encodeURIComponent(word.arabic)}&client=tw-ob`);
-    audio.play();
-  };
+  const utterance = new SpeechSynthesisUtterance(word.arabic);
+  utterance.lang = 'ar-SA';
+  const voices = window.speechSynthesis.getVoices();
+  const arabicVoice = voices.find(v => v.lang.startsWith('ar'));
+  if (arabicVoice) utterance.voice = arabicVoice;
+  window.speechSynthesis.speak(utterance);
+};
 }
 
 search.oninput = () => showWords(search.value.trim(), categorySelect.value);
