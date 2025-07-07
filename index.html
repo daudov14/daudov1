@@ -81,40 +81,34 @@
   </div>
 
   <script>
-    function calculateInstallment() {
-      const amount = parseFloat(document.getElementById('amount').value);
-      const months = parseInt(document.getElementById('months').value);
-      const rate = parseFloat(document.getElementById('rate').value);
+function calculateInstallment() {
+  const amount = parseFloat(document.getElementById('amount').value);
+  const months = parseInt(document.getElementById('months').value);
+  const rate = parseFloat(document.getElementById('rate').value);
 
-      if (!amount || !months || months <= 0) {
-        alert("Введите корректные значения.");
-        return;
-      }
+  if (!amount || !months || months <= 0) {
+    alert("Введите корректные значения.");
+    return;
+  }
 
-      const monthlyRate = rate / 100 / 12;
+  const monthlyRate = rate / 100 / 12;
+  let monthlyPayment, total;
 
-      let monthlyPayment, total;
+  if (monthlyRate === 0) {
+    monthlyPayment = amount / months;
+    total = amount;
+  } else {
+    // Аннуитетный платёж — точная формула
+    const r = monthlyRate;
+    const n = months;
+    monthlyPayment = amount * (r * Math.pow(1 + r, n)) / (Math.pow(1 + r, n) - 1);
+    total = monthlyPayment * n;
+  }
 
-      if (monthlyRate === 0) {
-        // Беспроцентная рассрочка
-        monthlyPayment = amount / months;
-        total = amount;
-      } else {
-        // Аннуитетная формула
-        const r = monthlyRate;
-        monthlyPayment = amount * (r / (1 - Math.pow(1 + r, -months)));
-        total = monthlyPayment * months;
-      }
+  const overpay = total - amount;
 
-      const overpay = total - amount;
-
-      // Вывод результатов
-      document.getElementById('monthly').textContent = monthlyPayment.toFixed(2);
-      document.getElementById('total').textContent = total.toFixed(2);
-      document.getElementById('overpay').textContent = overpay.toFixed(2);
-      document.getElementById('result').style.display = 'block';
-    }
-  </script>
-
-</body>
-</html>
+  document.getElementById('monthly').textContent = monthlyPayment.toFixed(2);
+  document.getElementById('total').textContent = total.toFixed(2);
+  document.getElementById('overpay').textContent = overpay.toFixed(2);
+  document.getElementById('result').style.display = 'block';
+}
