@@ -5,22 +5,98 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Арабские слова и игра</title>
 <style>
-body{margin:0;padding:1rem;font-family:sans-serif;background:#121212 url("IMG_0836.jpeg") no-repeat center center fixed;
-  background-size: cover;color:#eee;direction:rtl;}
-h1{text-align:center;}
-input,button,select{width:100%;margin:0.5rem 0;padding:0.5rem;font-size:1rem;border:none;border-radius:5px;}
-button{background:#333;color:white;}button:hover{background:#555;}
-.word-list{max-height:200px;overflow-y:auto;border:1px solid #333;padding:0.5rem;margin:1rem 0;}
-.word-item{padding:0.3rem;} 
-.word-item:hover{background:#333;cursor:pointer;}
-.word-item.selected{background:#555;}
-#translation{margin-top:1rem;text-align:center;font-size:1.2rem;}
-.game{margin-top:2rem;border-top:1px solid #333;padding-top:1rem;}
-.options button{margin:0.2rem;width:48%;}
-button:disabled{opacity:0.5;}
+body {
+  margin: 0;
+  padding: 1rem;
+  font-family: "Segoe UI", sans-serif;
+  background: #202020 url("IMG_0836.jpeg") no-repeat center center fixed;
+  background-size: cover;
+  color: #f5f5f5;
+  direction: rtl;
+}
+
+h1 {
+  text-align: center;
+  color: #ffcc00;
+  margin-bottom: 1rem;
+}
+
+input, select, button {
+  width: 100%;
+  margin: 0.3rem 0;
+  padding: 0.5rem;
+  font-size: 1rem;
+  border: none;
+  border-radius: 5px;
+}
+
+button {
+  background: #333;
+  color: white;
+  cursor: pointer;
+}
+
+button:hover {
+  background: #555;
+}
+
+.word-list {
+  max-height: 200px;
+  overflow-y: auto;
+  border: 1px solid #333;
+  padding: 0.5rem;
+  margin: 1rem 0;
+  background: rgba(0,0,0,0.5);
+}
+
+.word-item {
+  padding: 0.3rem;
+}
+
+.word-item:hover {
+  background: #444;
+  cursor: pointer;
+}
+
+.word-item.selected {
+  background: #666;
+}
+
+#translation {
+  margin-top: 1rem;
+  text-align: center;
+  font-size: 1.2rem;
+}
+
+.game {
+  margin-top: 2rem;
+  border-top: 1px solid #333;
+  padding-top: 1rem;
+}
+
+.options button {
+  margin: 0.2rem;
+  width: 48%;
+  background: #444;
+}
+
+.options button.selected {
+  background: #007bff;
+}
+
+#score, #timer {
+  margin: 0.5rem 0;
+  font-weight: bold;
+}
+
+button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
 </style>
 </head>
-  <body>
+
+<body>
 
 <h1>📖 Арабские слова и игра</h1>
 
@@ -54,7 +130,6 @@ button:disabled{opacity:0.5;}
   <div id="question"></div>
   <div class="options" id="options"></div>
   <div id="result" aria-live="polite"></div>
-  <button id="next">➡️ Следующее</button>
 </div>
 
 <script>
@@ -193,83 +268,16 @@ const words = [
   {arabic:"يعمل", translation:"работает", category:"Глаголы"},
   {arabic:"يلعب", translation:"играет", category:"Глаголы"},
 ];
-const wordList = document.getElementById('wordList');
-const search = document.getElementById('search');
-const translation = document.getElementById('translation');
-const playAudio = document.getElementById('playAudio');
-const categorySelect = document.getElementById('categorySelect');
-const resetFilter = document.getElementById('resetFilter');
-const gameCategory = document.getElementById('gameCategory');
 
-const uniqueCategories = [...new Set(words.map(w => w.category))];
-uniqueCategories.forEach(cat => {
-  const opt = document.createElement('option');
-  opt.value = cat;
-  opt.textContent = cat;
-  categorySelect.appendChild(opt);
+// … ваш JS для списка и фильтрации слов … (оставьте как у вас)
 
-  const opt2 = opt.cloneNode(true);
-  gameCategory.appendChild(opt2);
-});
-
-function showWords(filter='', cat='') {
-  wordList.innerHTML = '';
-  translation.textContent = '';
-  playAudio.style.display = 'none';
-  words.filter(w => 
-    (w.arabic.includes(filter) || w.translation.includes(filter)) &&
-    (cat==='' || w.category===cat)
-  ).forEach(w => {
-    const div = document.createElement('div');
-    div.className = 'word-item';
-    div.tabIndex = 0;
-    div.setAttribute('role', 'button');
-    div.setAttribute('aria-pressed', 'false');
-    div.textContent = `${w.arabic} — ${w.translation}`;
-    div.onclick = () => selectWord(div, w);
-    wordList.appendChild(div);
-  });
-}
-
-let selectedWordDiv = null;
-
-function selectWord(div, word) {
-  if (selectedWordDiv) {
-    selectedWordDiv.classList.remove('selected');
-    selectedWordDiv.setAttribute('aria-pressed', 'false');
-  }
-  selectedWordDiv = div;
-  div.classList.add('selected');
-  div.setAttribute('aria-pressed', 'true');
-  translation.textContent = `${word.arabic} — ${word.translation}`;
-  playAudio.style.display = 'inline-block';
-  playAudio.onclick = () => {
-  const utterance = new SpeechSynthesisUtterance(word.arabic);
-  utterance.lang = 'ar-SA';
-  const voices = window.speechSynthesis.getVoices();
-  const arabicVoice = voices.find(v => v.lang.startsWith('ar'));
-  if (arabicVoice) utterance.voice = arabicVoice;
-  window.speechSynthesis.speak(utterance);
-};
-}
-
-search.oninput = () => showWords(search.value.trim(), categorySelect.value);
-categorySelect.onchange = () => showWords(search.value.trim(), categorySelect.value);
-resetFilter.onclick = () => {
-  search.value = '';
-  categorySelect.value = '';
-  showWords();
-};
-showWords();
-
-// Игра
 const question = document.getElementById('question');
 const options = document.getElementById('options');
 const result = document.getElementById('result');
-const next = document.getElementById('next');
 const level = document.getElementById('level');
 const scoreDiv = document.getElementById('score');
 const timerDiv = document.getElementById('timer');
+const gameCategory = document.getElementById('gameCategory');
 
 let gamePool = [...words];
 let score = 0;
@@ -282,7 +290,7 @@ gameCategory.onchange = resetGame;
 
 function resetGame() {
   score = 0;
-  scoreDiv.textContent = `Очки: ${score}`;
+  scoreDiv.textContent = ⁠ Очки: ${score} ⁠;
   buildPool();
   newGame();
 }
@@ -296,27 +304,24 @@ function buildPool() {
 function startTimer() {
   clearInterval(timer);
   timeLeft = 15;
-  timerDiv.textContent = `⏳ ${timeLeft}`;
+  timerDiv.textContent = ⁠ ⏳ ${timeLeft} ⁠;
   timer = setInterval(()=>{
     timeLeft--;
-    timerDiv.textContent = `⏳ ${timeLeft}`;
+    timerDiv.textContent = ⁠ ⏳ ${timeLeft} ⁠;
     if(timeLeft<=0){
       clearInterval(timer);
-      result.textContent=`⏱️ Время вышло! Правильный ответ: ${lastCorrectAnswer}`;
-      disableOptions();
+      showResult(false);
+      setTimeout(newGame, 2000);
     }
   },1000);
 }
 
 function newGame() {
-  if(result.textContent.includes('❌') || result.textContent.includes('⏱️')) {
-    result.textContent += ` Правильный ответ: ${lastCorrectAnswer}`;
-  } else {
-    result.textContent = '';
-  }
+  result.textContent = '';
   buildPool();
+
   const word = gamePool[Math.floor(Math.random()*gamePool.length)];
-  question.textContent = `Как переводится: ${word.translation}?`;
+  question.textContent = ⁠ Как переводится: ${word.translation}? ⁠;
   lastCorrectAnswer = word.arabic;
 
   const choices = new Set([word.arabic]);
@@ -328,29 +333,35 @@ function newGame() {
   Array.from(choices).sort(()=>Math.random()-0.5).forEach(choice => {
     const btn = document.createElement('button');
     btn.textContent = choice;
-    btn.setAttribute('role', 'button');
-    btn.onclick = () => {
-      clearInterval(timer);
-      if(choice===word.arabic) {
-        result.textContent='✅ Верно!';
-        score++;
-      } else {
-        result.textContent=`❌ Неверно. Правильный ответ: ${word.arabic}`;
-      }
-      scoreDiv.textContent = `Очки: ${score}`;
-      disableOptions();
-    };
+    btn.onclick = () => handleAnswer(btn, choice===word.arabic);
     options.appendChild(btn);
   });
+
   startTimer();
 }
 
-function disableOptions(){
-  options.querySelectorAll('button').forEach(btn=>btn.disabled=true);
+function handleAnswer(button, correct) {
+  clearInterval(timer);
+
+  options.querySelectorAll('button').forEach(btn => btn.disabled=true);
+  button.classList.add('selected');
+
+  showResult(correct);
+  if (correct) score++;
+
+  scoreDiv.textContent = ⁠ Очки: ${score} ⁠;
+  setTimeout(newGame, 2000);
 }
 
-next.onclick = newGame;
-newGame();
+function showResult(correct) {
+  if (correct) {
+    result.textContent='✅ Верно!';
+  } else {
+    result.textContent=⁠ ❌ Неверно. Правильный ответ: ${lastCorrectAnswer} ⁠;
+  }
+}
+
+resetGame();
 </script>
 
 </body>
